@@ -22,9 +22,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} antialiased`} suppressHydrationWarning>
       <body>
-        <main>
+        <main className="relative">
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <ThemeToggle />
+            <div className="absolute top-4 right-4 z-50">
+              <ThemeToggle />
+            </div>
             {children}
           </ThemeProvider>
         </main>

@@ -8,8 +8,8 @@ interface SidebarProps {
 
 export function Sidebar({ currentView, onViewChange }: SidebarProps) {
   return (
-    <div className="w-64 h-screen border-r border-border bg-muted/40 p-4">
-      <div className="space-y-2">
+    <div className="w-64 h-screen border-r border-border bg-background lg:bg-muted/40 p-4 relative z-50">
+      <div className="space-y-2 mt-16 lg:mt-0">
         <Button
           variant={currentView === 'random' ? "secondary" : "ghost"}
           className="w-full justify-start"

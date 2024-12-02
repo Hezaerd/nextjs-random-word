@@ -7,13 +7,15 @@ import { useToast } from "@/hooks/use-toast";
 import { WordView } from "@/components/views/word-view";
 import { LikedWordsView } from "@/components/views/liked-words-view";
 import { HistoryView } from "@/components/views/history-view";
-
+import { Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const [randomWord, setRandomWord] = useState("");
   const [likedWords, setLikedWords] = useState<string[]>([]);
   const [wordHistory, setWordHistory] = useState<string[]>([]);
   const [currentView, setCurrentView] = useState<'random' | 'liked' | 'history'>('random');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const { toast } = useToast();
 
@@ -82,29 +84,64 @@ export default function Home() {
     });
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
-    <div className="flex h-screen">
-      <Sidebar currentView={currentView} onViewChange={setCurrentView} />
-      {currentView === 'random' ? (
-        <WordView
-          randomWord={randomWord}
-          likedWords={likedWords}
-          onGenerate={handleGenerate}
-          onLike={handleLike}
+    <div className="flex h-screen relative">
+      {/* Mobile Menu Button */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="lg:hidden absolute top-4 left-4 z-50"
+        onClick={toggleSidebar}
+      >
+        <Menu className="h-6 w-6" />
+      </Button>
+
+      {/* Sidebar */}
+      <div className={`
+        fixed inset-0 z-40 lg:relative
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        transition-transform duration-300 ease-in-out
+      `}>
+        <div
+          className="absolute inset-0 bg-background/80 backdrop-blur-sm lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
         />
-      ) : currentView === 'liked' ? (
-        <LikedWordsView
-          likedWords={likedWords}
-          onUnlike={handleUnlike}
+        <Sidebar
+          currentView={currentView}
+          onViewChange={(view) => {
+            setCurrentView(view);
+            setIsSidebarOpen(false);
+          }}
         />
-      ) : (
-        <HistoryView
-          wordHistory={wordHistory}
-          likedWords={likedWords}
-          onUnlike={handleUnlike}
-          onLike={handleLikeFromHistory}
-        />
-      )}
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-hidden pt-16 lg:pt-0">
+        {currentView === 'random' ? (
+          <WordView
+            randomWord={randomWord}
+            likedWords={likedWords}
+            onGenerate={handleGenerate}
+            onLike={handleLike}
+          />
+        ) : currentView === 'liked' ? (
+          <LikedWordsView
+            likedWords={likedWords}
+            onUnlike={handleUnlike}
+          />
+        ) : (
+          <HistoryView
+            wordHistory={wordHistory}
+            likedWords={likedWords}
+            onUnlike={handleUnlike}
+            onLike={handleLikeFromHistory}
+          />
+        )}
+      </div>
     </div>
   );
 }
