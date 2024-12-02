@@ -5,11 +5,14 @@ import { generate } from "random-words";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Heart } from "lucide-react";
 import { Sidebar } from "@/components/ui/sidebar";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
   const [randomWord, setRandomWord] = useState("");
   const [likedWords, setLikedWords] = useState<string[]>([]);
   const [currentView, setCurrentView] = useState<'random' | 'liked'>('random');
+
+  const { toast } = useToast();
 
   useEffect(() => {
     setRandomWord(generate(1)[0]);
@@ -30,8 +33,16 @@ export default function Home() {
     if (newLikedWords.includes(randomWord)) {
       const index = newLikedWords.indexOf(randomWord);
       newLikedWords.splice(index, 1);
+      toast({
+        title: "💔 Unliked Word",
+        description: `${randomWord}`,
+      });
     } else {
       newLikedWords.push(randomWord);
+      toast({
+        title: "❤️ Liked Word",
+        description: `${randomWord}`,
+      });
     }
 
     setLikedWords(newLikedWords);
@@ -91,12 +102,15 @@ export default function Home() {
     const newLikedWords = likedWords.filter(w => w !== word);
     setLikedWords(newLikedWords);
     localStorage.setItem('likedWords', JSON.stringify(newLikedWords));
+    toast({
+      description: `Removed "${word}" from liked words`,
+    });
   };
 
   return (
-    <main className="flex h-screen">
+    <div className="flex h-screen">
       <Sidebar currentView={currentView} onViewChange={setCurrentView} />
       {currentView === 'random' ? <RandomWordView /> : <LikedWordsView />}
-    </main>
+    </div>
   );
 }
