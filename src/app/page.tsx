@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw, Heart } from "lucide-react";
 import { Sidebar } from "@/components/ui/sidebar";
 import { useToast } from "@/hooks/use-toast";
+import { WordWithDefinition } from "@/components/ui/word-with-definition";
 
 export default function Home() {
   const [randomWord, setRandomWord] = useState("");
@@ -51,7 +52,11 @@ export default function Home() {
 
   const RandomWordView = () => (
     <div className="flex flex-col items-center justify-center flex-1">
-      <p className="text-4xl font-bold">{randomWord}</p>
+      <WordWithDefinition word={randomWord}>
+        <p className="text-4xl font-bold hover:text-primary/80 transition-colors cursor-help">
+          {randomWord}
+        </p>
+      </WordWithDefinition>
       <div className="flex gap-2 mt-4">
         <Button onClick={handleGenerate} className="w-32">
           <RefreshCw className="mr-2 h-4 w-4" />
@@ -80,7 +85,11 @@ export default function Home() {
             key={word}
             className="px-4 py-2 bg-secondary rounded-md flex items-center gap-2"
           >
-            <span>{word}</span>
+            <WordWithDefinition word={word}>
+              <span className="cursor-help hover:text-primary/80 transition-colors">
+                {word}
+              </span>
+            </WordWithDefinition>
             <Button
               variant="ghost"
               size="sm"
