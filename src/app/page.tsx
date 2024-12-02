@@ -11,21 +11,33 @@ import { WordWithDefinition } from "@/components/ui/word-with-definition";
 export default function Home() {
   const [randomWord, setRandomWord] = useState("");
   const [likedWords, setLikedWords] = useState<string[]>([]);
-  const [currentView, setCurrentView] = useState<'random' | 'liked'>('random');
+  const [wordHistory, setWordHistory] = useState<string[]>([]);
+  const [currentView, setCurrentView] = useState<'random' | 'liked' | 'history'>('random');
 
   const { toast } = useToast();
 
   useEffect(() => {
-    setRandomWord(generate(1)[0]);
+    const initialWord = generate(1)[0];
+    setRandomWord(initialWord);
+    setWordHistory([initialWord]);
 
     const savedLikedWords = localStorage.getItem('likedWords');
+    const savedWordHistory = localStorage.getItem('wordHistory');
+
     if (savedLikedWords) {
       setLikedWords(JSON.parse(savedLikedWords));
+    }
+    if (savedWordHistory) {
+      setWordHistory(JSON.parse(savedWordHistory));
     }
   }, []);
 
   const handleGenerate = () => {
-    setRandomWord(generate(1)[0]);
+    const newWord = generate(1)[0];
+    setRandomWord(newWord);
+    const newHistory = [newWord, ...wordHistory].slice(0, 50); // Keep last 50 words
+    setWordHistory(newHistory);
+    localStorage.setItem('wordHistory', JSON.stringify(newHistory));
   };
 
   const handleLike = () => {
@@ -116,10 +128,70 @@ export default function Home() {
     });
   };
 
+  const HistoryView = () => (
+    <div className="flex-1 p-8 h-screen overflow-hidden">
+      <h1 className="text-2xl font-bold mb-6">Word History</h1>
+      <div className="flex flex-col gap-3 max-w-md h-[calc(100vh-8rem)] overflow-y-auto">
+        {wordHistory.map((word, index) => (
+          <div
+            key={`${word}-${index}`}
+            className="px-4 py-2 bg-secondary rounded-md flex items-center justify-between"
+          >
+            <WordWithDefinition word={word}>
+              <span className="cursor-help hover:text-primary/80 transition-colors">
+                {word}
+              </span>
+            </WordWithDefinition>
+            <div className="flex items-center gap-2">
+              {likedWords.includes(word) ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                  onClick={() => handleUnlike(word)}
+                >
+                  <Heart className="h-4 w-4 fill-current" />
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                  onClick={() => handleLikeFromHistory(word)}
+                >
+                  <Heart className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          </div>
+        ))}
+        {wordHistory.length === 0 && (
+          <p className="text-muted-foreground">No word history yet. Go generate some!</p>
+        )}
+      </div>
+    </div>
+  );
+
+  const handleLikeFromHistory = (word: string) => {
+    const newLikedWords = [...likedWords, word];
+    setLikedWords(newLikedWords);
+    localStorage.setItem('likedWords', JSON.stringify(newLikedWords));
+    toast({
+      title: "❤️ Liked Word",
+      description: `${word}`,
+    });
+  };
+
   return (
     <div className="flex h-screen">
       <Sidebar currentView={currentView} onViewChange={setCurrentView} />
-      {currentView === 'random' ? <RandomWordView /> : <LikedWordsView />}
+      {currentView === 'random' ? (
+        <RandomWordView />
+      ) : currentView === 'liked' ? (
+        <LikedWordsView />
+      ) : (
+        <HistoryView />
+      )}
     </div>
   );
 }

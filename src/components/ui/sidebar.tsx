@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Heart } from "lucide-react";
+import { RefreshCw, Heart, History } from "lucide-react";
 
 interface SidebarProps {
-  currentView: 'random' | 'liked';
-  onViewChange: (view: 'random' | 'liked') => void;
+  currentView: 'random' | 'liked' | 'history';
+  onViewChange: (view: 'random' | 'liked' | 'history') => void;
 }
 
 export function Sidebar({ currentView, onViewChange }: SidebarProps) {
@@ -25,6 +25,14 @@ export function Sidebar({ currentView, onViewChange }: SidebarProps) {
         >
           <Heart className="mr-2 h-4 w-4" />
           Liked Words
+        </Button>
+        <Button
+          variant={currentView === 'history' ? "secondary" : "ghost"}
+          className="w-full justify-start"
+          onClick={() => onViewChange('history')}
+        >
+          <History className="mr-2 h-4 w-4" />
+          History
         </Button>
       </div>
     </div>
