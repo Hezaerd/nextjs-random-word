@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Heart, History } from "lucide-react";
-import { GithubAuthButton } from "../auth/github-auth-button";
 
 interface SidebarProps {
   currentView: 'random' | 'liked' | 'history';
@@ -35,8 +34,6 @@ export function Sidebar({ currentView, onViewChange }: SidebarProps) {
           <History className="mr-2 h-4 w-4" />
           History
         </Button>
-
-        <GithubAuthButton />
       </div>
     </div>
   );
